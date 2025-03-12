@@ -274,7 +274,7 @@ with open('Property Guru.csv', mode='w', newline='', encoding='utf-8') as file:
             profile_page.goto(f"https://www.propertyguru.com.sg{href}", wait_until="domcontentloaded")
             profile_page.wait_for_load_state("domcontentloaded")
             time.sleep(random.uniform(1, 2))
-            time.sleep(1)
+            time.sleep(120)
             profile_page.close()
             time.sleep(random.uniform(1, 2))
             time.sleep(1)
