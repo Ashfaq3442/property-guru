@@ -81,8 +81,10 @@
 #             "--disable-features=IsolateOrigins,site-per-process",
 #             "--disable-dev-shm-usage",
 #             "--enable-gpu",
-#             "--disable-extensions"
-#         ])
+#             "--disable-extensions"],
+#             proxy={"server": "http://127.0.0.1:8082"}
+            
+#         )
 #         page = browser.new_page()
 #         time.sleep(60)
 #         stealth_sync(page)  # Apply stealth mode
@@ -218,13 +220,16 @@ user_agents = [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Edge/120.0.0.0 Safari/537.36",
     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
 ]
+x_target = random.randint(40, 60)  # Target around 50 with small variations
+y_target = random.randint(380, 420)  # Target around 400 with small variations
 
+steps = random.randint(20, 40)  # Random steps between 20 and 40 for smooth motion
 with open('Property Guru.csv', mode='w', newline='', encoding='utf-8') as file:
     writer = csv.writer(file)
     writer.writerow(["Title", "Link"])  # Write CSV header
 
     with sync_playwright() as playwright:
-        browser = playwright.chromium.launch(headless=False, slow_mo=500, args=[
+        browser = playwright.chromium.launch(headless=False, slow_mo=500,proxy={"server": "http://127.0.0.1:8080"}, args=[
             "--disable-blink-features=AutomationControlled",
             "--no-sandbox",
             "--disable-setuid-sandbox",
@@ -237,42 +242,136 @@ with open('Property Guru.csv', mode='w', newline='', encoding='utf-8') as file:
         
         page = browser.new_page()
         stealth_sync(page)  # Apply stealth mode
+        page.mouse.move(x_target, y_target, steps=steps)
         
         # Rotate User-Agent for the main page
         random_user_agent = random.choice(user_agents)
-        page.set_extra_http_headers({"User-Agent": random_user_agent})
+        page.set_extra_http_headers({"User-Agent": random_user_agent,
+        "Accept-Language": "en-US,en;q=0.9",
+        "Referer": "https://www.google.com/",
+        "Sec-Fetch-Mode": "navigate"})
         print(f"Using User-Agent: {random_user_agent}")
 
         page.goto("https://www.propertyguru.com.sg/property-for-sale/", wait_until="domcontentloaded")
+        time.sleep(60)
 
         # Accept Cookies if banner exists
-        accept_button = page.query_selector("div.cookie-banner-action button.btn-dark")
-        if accept_button:
-            accept_button.click()
-            time.sleep(random.uniform(2, 4))
+        # accept_button = page.query_selector("div.cookie-banner-action button.btn-dark")
+        # if accept_button:
+        #     page.mouse.move(x_target, y_target, steps=steps)
+        #     accept_button.click()
+        #     time.sleep(random.uniform(2, 4))
 
-        # Scroll multiple times
-        for _ in range(7):  
-            page.evaluate("window.scrollBy(0, 2500)")
-            time.sleep(random.uniform(1, 2))
+        # # Scroll multiple times
+        # for _ in range(7):  
+        #     page.evaluate("window.scrollBy(0, 2500)")
+        #     page.mouse.move(x_target, y_target, steps=steps)
+        #     time.sleep(random.uniform(1, 2))
 
-        # Iterate over pages 2-22
-        for page_num in range(2, 22):
-            href = f"/property-for-sale/{page_num}"
+        # # Iterate over pages 2-22
+        # for page_num in range(2, 25):
+        #     href = f"/property-for-sale/{page_num}"
 
-            # Open a new tab for each page
-            profile_page = browser.new_page()
+        #     # Open a new tab for each page
+        #     profile_page = browser.new_page()
+        #     page.mouse.move(x_target, y_target, steps=steps)
 
-            # Rotate User-Agent for each new page
-            random_user_agent = random.choice(user_agents)
-            profile_page.set_extra_http_headers({"User-Agent": random_user_agent})
-            print(f"Using User-Agent: {random_user_agent}")
+        #     # Rotate User-Agent for each new page
+        #     random_user_agent = random.choice(user_agents)
+        #     page.mouse.move(x_target, y_target, steps=steps)
+        #     profile_page.set_extra_http_headers({"User-Agent": random_user_agent})
+        #     print(f"Using User-Agent: {random_user_agent}")
 
-            profile_page.goto(f"https://www.propertyguru.com.sg{href}", wait_until="domcontentloaded")
-            time.sleep(random.uniform(1, 2))
+        #     profile_page.goto(f"https://www.propertyguru.com.sg{href}", wait_until="domcontentloaded")
+        #     time.sleep(random.uniform(1, 2))
 
-            profile_page.close()
-            time.sleep(random.uniform(1, 2))
+        #     profile_page.close()
+        #     time.sleep(random.uniform(1, 2))
 
-        page.close()
-        browser.close()
+        # page.close()
+        # browser.close()
+
+
+
+
+
+
+# from playwright.sync_api import sync_playwright
+# from playwright_stealth import stealth_sync
+# import random
+# import time
+
+# # List of User Agents for rotation
+# user_agents = [
+#     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+#     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+#     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Edge/120.0.0.0 Safari/537.36",
+#     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+# ]
+
+# x_target = random.randint(40, 60)  # Target around 50 with small variations
+# y_target = random.randint(380, 420)  # Target around 400 with small variations
+
+# steps = random.randint(20, 40)  # Random steps between 20 and 40 for smooth motion
+
+# # Move the mouse
+
+
+# with sync_playwright() as playwright:
+#     browser = playwright.chromium.launch(headless=False)
+#     page = browser.new_page()
+#     page.mouse.move(x_target, y_target, steps=steps)
+#     time.sleep(random.uniform(5, 10))
+
+#     # Apply stealth mode
+#     stealth_sync(page)
+
+#     # Rotate User-Agent and Set Extra Headers
+#     random_user_agent = random.choice(user_agents)
+#     page.set_extra_http_headers({
+#         "User-Agent": random_user_agent,
+#         "Accept-Language": "en-US,en;q=0.9",
+#         "Referer": "https://www.google.com/",
+#         "Sec-Fetch-Mode": "navigate"
+#     })
+#     page.mouse.move(x_target, y_target, steps=steps)
+#     print(f"Using User-Agent: {random_user_agent}")
+
+#     # Open the page
+#     page.goto("https://www.propertyguru.com.sg/property-for-sale/", wait_until="domcontentloaded")
+
+#     page.mouse.move(x_target, y_target, steps=steps)
+#     time.sleep(random.uniform(5, 10))
+#     time.sleep(10)
+#     # Accept Cookies
+#     accept_button = page.query_selector("div.cookie-banner-action button.btn-dark")
+#     if accept_button:
+#         page.mouse.move(50, 100, steps=25)
+#         page.wait_for_load_state("domcontentloaded")
+#         accept_button.click()
+
+#     for _ in range(7):  # Adjust the range for longer scrolling
+#         page.evaluate("window.scrollBy(0, 2500)")  # Scrolls down 200 pixels
+#         page.mouse.move(150, 200, steps=25)
+#         time.sleep(random.uniform(1, 2))  # Wait randomly to mimic human behavior
+#         page.wait_for_load_state("domcontentloaded")
+#         time.sleep(1)
+
+#     for page_num in range(2,22):
+#         href=(f"/property-for-sale/{page_num}")
+#         page.mouse.move(500, 600, steps=25)
+#         #open new tab for each page
+#         page.mouse.move(550, 650, steps=25)
+#         profile_page = browser.new_page()
+#         profile_page.set_extra_http_headers({
+#                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
+#             })
+#         page.mouse.move(600, 750, steps=25)
+#         profile_page.goto(f"https://www.propertyguru.com.sg{href}", wait_until="domcontentloaded")
+#         profile_page.wait_for_load_state("domcontentloaded")
+#         time.sleep(random.uniform(1, 2))
+#         time.sleep(1)
+#         profile_page.close()
+#         time.sleep(random.uniform(1, 2))
+#         time.sleep(1)
+#     page.close()
